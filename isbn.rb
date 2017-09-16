@@ -21,7 +21,7 @@ module Isbn
         return checkdigit == -1 * digits.map.with_index{ |d,i| (i%2==0) ? d : d*3 }.reduce(:+) % 10
     end
 
-    def Isbn.check_isbn(input)
+    def Isbn.valid?(input)
         return check_isbn10(input) || check_isbn13(input)
     end
 

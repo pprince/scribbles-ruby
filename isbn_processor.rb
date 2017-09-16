@@ -2,22 +2,33 @@
 
 require_relative 'isbn'
 
-puts "Valid ISBN10's:"
-puts Isbn.check_isbn('123456789X')
-puts Isbn.check_isbn('01 234 567 89')
-puts Isbn.check_isbn('0-471-958-697')
-puts
-puts "Invalid ISBN10's:"
-puts Isbn.check_isbn('0123456780')
-puts Isbn.check_isbn('0-471-958-698')
-puts Isbn.check_isbn('123456789x')
-puts
-puts "Valid ISBN13's:"
-puts Isbn.check_isbn('9780470059029')
-puts Isbn.check_isbn('978-0-13-149505-0')
-puts Isbn.check_isbn('978 0 471 48648 0')
-puts
-puts "Invalid ISBN13's:"
-puts Isbn.check_isbn('9780470059020')
-puts Isbn.check_isbn('978-0-13-149505-1')
-puts Isbn.check_isbn('978_0_471_48648_0')
+# Validate command-line arguments
+unless ARGV.length == 2 then
+    cmd = File.basename($0)
+    $stderr.puts <<~EOF
+        #{cmd}: ERROR: wrong number of arguments (expected 2, got #{ARGV.length}.)
+
+            Usage:  #{cmd} <input_file> <output_file>
+
+            Example:  ./#{cmd} sampledata.txt OUT.csv
+
+    EOF
+    exit(1)
+end
+
+
+in_file = File.open(ARGV[0], 'r')
+out_file = File.open(ARGV[1], 'w')
+
+in_file.readlines.each do |line|
+    next if line =~ /^\s*$/  # skip blank lines
+    next if line =~ /^\s*#/  # skip comments
+
+    col1 = line.chomp
+    col2 = Isbn.valid?(col1) ? "valid" : "invalid"
+
+    out_file.puts %Q("#{col1}","#{col2}")
+end
+
+in_file.close()
+out_file.close()
